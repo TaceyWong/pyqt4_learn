@@ -9,23 +9,31 @@ from PyQt4 import QtGui
 class Example(QtGui.QMainWindow):
     def __init__(self):
         super(Example,self).__init__()
+
         self.initUI()
 
     def initUI(self):
-        exitAction = QtGui.QAction(QtGui.QIcon('../icons/Exit-48.png'),'&Exit',self)
-        exitAction.setShortcut('Ctrl+Q')
+
+        textEdit = QtGui.QTextEdit()
+        self.setCentralWidget(textEdit)
+
+        exitAction = QtGui.QAction(QtGui.QIcon("../icons/Exit-48.png"),"Exit",self)
+        exitAction.setShortcut("Ctrl+Q")
         exitAction.setStatusTip(u"退出程序")
-        exitAction.triggered.connect(QtGui.qApp.quit)
+        exitAction.triggered.connect(self.close)
 
         self.statusBar()
 
         menubar = self.menuBar()
-        fileMenu = menubar.addMenu('&File')
+        fileMenu = menubar.addMenu("&File")
         fileMenu.addAction(exitAction)
 
-        self.setGeometry(300,300,300,200)
-        self.setWindowTitle(u"菜单")
+        toolbar = self.addToolBar("Exit")
+        toolbar.addAction(exitAction)
 
+        self.setGeometry(300,300,300,200)
+        self.setWindowTitle(u"菜单和工具栏")
+        self.setWindowIcon(QtGui.QIcon("../icons/Edit-96.png"))
         self.show()
 
 def main():

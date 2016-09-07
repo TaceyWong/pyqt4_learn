@@ -11,3 +11,7 @@ PyQt4学习
 + [QT参考文档：玩到最后不得不看QT了](http://www.kuqin.com/qtdocument/)
 + [QT designer文档](http://doc.qt.io/qt-4.8/designer-manual.html)
 + [汇总](https://segmentfault.com/a/1190000005165656)
+
+
+##Icons
+https://www.zhihu.com/question/19857245
