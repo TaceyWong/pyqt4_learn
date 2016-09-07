@@ -15,7 +15,7 @@ class Example(QtGui.QWidget):
         self.show()
 
     def closeEvent(self,event):
-        reply = QtGui.QMessageBox.question(self,"Message",
+        reply = QtGui.QMessageBox.question(self,u"通知消息",
                 u"你确定要退出?",
                 QtGui.QMessageBox.Yes|QtGui.QMessageBox.No,
                 QtGui.QMessageBox.No)
