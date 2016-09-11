@@ -15,8 +15,55 @@ PyQt4学习
 + http://www.rkblog.rk.edu.pl/w/p/simple-text-editor-pyqt4/
 + https://github.com/shuge/Qt-Python-Binding-Examples
 + https://github.com/jimmykuu/PyQt-PySide-Cookbook
+
+##主要内容
+
+!(PyQt4模块)[arc.png]
+
+
++ QtCore：核心的非GUI功能，对时间、文件、目录、各种数据类型、流、网址、媒体类型、线程或进程进行处理
+
++ QtGui：图形化窗口组件和及相关类。包括如按钮、窗体、状态栏、滑块、位图、颜色、字体等等
+
++ QtHelp：包含了用于创建和查看可查找的文档的类
+
++ QtNetwork：包括网络编程的类。用来编写TCP/IP和UDP的客户端和服务器
+
++ QtOpenGL：使用OpenGL库来渲染3D和2D图形
+
++ QtScript：包含了使PyQt应用程序使用JavaScript解释器编写脚本的类
+
++ QtSql：提供操作数据库的类
+
++ QtSvg：提供了显示SVG文件内容的类。可缩放矢量图形(SVG)
+
++ QtTest：包含了对PyQt应用程序进行单元测试的功能
+
++ QtWebKit：实现了基于开源浏览器引擎WebKit的浏览器引擎
+
++ QtXml：处理XML文件的类，该模块提供了SAX和DOM API的接口
+
++ QtXmlPatterns：包含的类实现了对XML和自定义数据模型的XQuery和XPath的支持
+
++ phonon：包含的类实现了跨平台的多媒体框架，可以在PyQt应用程序中使用音频和视频内容
+
++ QtMultimedia：提供了低级的多媒体功能，通常更多使用 phonon 模块
+
++ QtAssistant：包含的类允许集成 Qt Assistant 到PyQt应用程序中，提供在线帮助。
+
++ QtDesigner：包含的类允许使用PyQt扩展 Qt Designer 。
+
++ Qt：综合了上面描述的模块中的类到一个单一的模块中。
+
+
+
+
+
+
+
 ##Icons
 https://www.zhihu.com/question/19857245
+
 
 
 ##Tiny Projects Plan
