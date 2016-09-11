@@ -4,12 +4,15 @@ import sys
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import Qt
 
+from ext import *
+
 
 class Main(QtGui.QMainWindow):
     def __init__(self, parent=None):
         # QtGui.QMainWindow.__init__()
         super(Main, self).__init__(parent=None)
         self.filename = ""
+        self.changesSaved = True
         self.initUI()
 
     def initToolbar(self):
@@ -74,6 +77,16 @@ class Main(QtGui.QMainWindow):
         numberedAction.setShortcut("Ctrl+Shift+L")
         numberedAction.triggered.connect(self.numberList)
 
+        self.findAction = QtGui.QAction(QtGui.QIcon("icons/find.png"), "Find and replace", self)
+        self.findAction.setStatusTip("Find and replace words in your document")
+        self.findAction.setShortcut("Ctrl+F")
+        self.findAction.triggered.connect(find.Find(self).show)
+
+        imageAction = QtGui.QAction(QtGui.QIcon("icons/image.png"), "Insert image", self)
+        imageAction.setStatusTip("Insert image")
+        imageAction.setShortcut("Ctrl+Shift+I")
+        imageAction.triggered.connect(self.insertImage)
+
         self.toolbar = self.addToolBar(u"选项")
         self.toolbar.addAction(self.newAction)
         self.toolbar.addAction(self.openAction)
@@ -93,6 +106,26 @@ class Main(QtGui.QMainWindow):
         self.toolbar.addAction(numberedAction)
 
         self.toolbar.addSeparator()
+
+        self.toolbar.addAction(self.findAction)
+        self.toolbar.addSeparator()
+
+        self.toolbar.addAction(imageAction)
+
+        dateTimeAction = QtGui.QAction(QtGui.QIcon("icons/calender.png"), "Insert current date/time", self)
+        dateTimeAction.setStatusTip("Insert current date/time")
+        dateTimeAction.setShortcut("Ctrl+D")
+        dateTimeAction.triggered.connect(datetime.DateTime(self).show)
+
+        self.toolbar.addAction(dateTimeAction)
+
+        tableAction = QtGui.QAction(QtGui.QIcon("icons/table.png"), "Insert table", self)
+        tableAction.setStatusTip("Insert table")
+        tableAction.setShortcut("Ctrl+T")
+        tableAction.triggered.connect(table.Table(self).show)
+
+        self.toolbar.addAction(tableAction)
+
         self.addToolBarBreak()
 
     def initFormatbar(self):
@@ -189,6 +222,16 @@ class Main(QtGui.QMainWindow):
         self.formatbar.addAction(indentAction)
         self.formatbar.addAction(dedentAction)
 
+        self.formatbar.addSeparator()
+
+
+        wordCountAction = QtGui.QAction(QtGui.QIcon("icons/count.png"), "See word/symbol count", self)
+        wordCountAction.setStatusTip("See word/symbol count")
+        wordCountAction.setShortcut("Ctrl+W")
+        wordCountAction.triggered.connect(self.wordCount)
+
+        self.toolbar.addAction(wordCountAction)
+
     def initMenubar(self):
         menubar = self.menuBar()
 
@@ -207,7 +250,7 @@ class Main(QtGui.QMainWindow):
         edit.addAction(self.cutAction)
         edit.addAction(self.copyAction)
         edit.addAction(self.pasteAction)
-
+        edit.addAction(self.findAction)
         # Toggling actions for the various bars
         toolbarAction = QtGui.QAction("Toggle Toolbar", self)
         toolbarAction.triggered.connect(self.toggleToolbar)
@@ -227,6 +270,9 @@ class Main(QtGui.QMainWindow):
         self.text.setTabStopWidth(33)
         self.setCentralWidget(self.text)
 
+        self.text.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.text.customContextMenuRequested.connect(self.context)
+        self.text.textChanged.connect(self.changed)
         self.initToolbar()
         self.initFormatbar()
         self.initMenubar()
@@ -269,6 +315,7 @@ class Main(QtGui.QMainWindow):
 
         with open(self.filename, "wt") as file:
             file.write(self.text.toHtml())
+        self.changesSaved = True
 
     def bulletList(self):
 
@@ -462,6 +509,222 @@ class Main(QtGui.QMainWindow):
         # Set the visibility to its inverse
         self.statusbar.setVisible(not state)
 
+    def insertImage(self):
+        filename = QtGui.QFileDialog.getOpenFileName(self, u"插入图片", ".","*.png")
+        # "Images (*.png *.xpm *.jpg *.bmp *.gif)")
+        image = QtGui.QImage(filename)
+        if image.isNull():
+            popup = QtGui.QMessageBox(
+                QtGui.QMessageBox.Critical,
+                u"图片加载错误",
+                u"不能加载图片文件",
+                QtGui.QMessageBox.Ok,
+                self
+            )
+
+            popup.show()
+        else:
+            cursor = self.text.textCursor()
+            cursor.insertImage(image, filename)
+
+    def wordCount(self):
+
+        wc = wordcount.WordCount(self)
+
+        wc.getText()
+
+        wc.show()
+
+    def context(self, pos):
+
+        # Grab the cursor
+        cursor = self.text.textCursor()
+
+        # Grab the current table, if there is one
+        table = cursor.currentTable()
+
+        # Above will return 0 if there is no current table, in which case
+        # we call the normal context menu. If there is a table, we create
+        # our own context menu specific to table interaction
+        if table:
+
+            menu = QtGui.QMenu(self)
+
+            appendRowAction = QtGui.QAction("Append row", self)
+            appendRowAction.triggered.connect(lambda: table.appendRows(1))
+
+            appendColAction = QtGui.QAction("Append column", self)
+            appendColAction.triggered.connect(lambda: table.appendColumns(1))
+
+            removeRowAction = QtGui.QAction("Remove row", self)
+            removeRowAction.triggered.connect(self.removeRow)
+
+            removeColAction = QtGui.QAction("Remove column", self)
+            removeColAction.triggered.connect(self.removeCol)
+
+            insertRowAction = QtGui.QAction("Insert row", self)
+            insertRowAction.triggered.connect(self.insertRow)
+
+            insertColAction = QtGui.QAction("Insert column", self)
+            insertColAction.triggered.connect(self.insertCol)
+
+            mergeAction = QtGui.QAction("Merge cells", self)
+            mergeAction.triggered.connect(lambda: table.mergeCells(cursor))
+
+            # Only allow merging if there is a selection
+            if not cursor.hasSelection():
+                mergeAction.setEnabled(False)
+
+            splitAction = QtGui.QAction("Split cells", self)
+
+            cell = table.cellAt(cursor)
+
+            # Only allow splitting if the current cell is larger
+            # than a normal cell
+            if cell.rowSpan() > 1 or cell.columnSpan() > 1:
+
+                splitAction.triggered.connect(lambda: table.splitCell(cell.row(), cell.column(), 1, 1))
+
+            else:
+                splitAction.setEnabled(False)
+
+            menu.addAction(appendRowAction)
+            menu.addAction(appendColAction)
+
+            menu.addSeparator()
+
+            menu.addAction(removeRowAction)
+            menu.addAction(removeColAction)
+
+            menu.addSeparator()
+
+            menu.addAction(insertRowAction)
+            menu.addAction(insertColAction)
+
+            menu.addSeparator()
+
+            menu.addAction(mergeAction)
+            menu.addAction(splitAction)
+
+            # Convert the widget coordinates into global coordinates
+            pos = self.mapToGlobal(pos)
+
+            # Add pixels for the tool and formatbars, which are not included
+            # in mapToGlobal(), but only if the two are currently visible and
+            # not toggled by the user
+
+            if self.toolbar.isVisible():
+                pos.setY(pos.y() + 45)
+
+            if self.formatbar.isVisible():
+                pos.setY(pos.y() + 45)
+
+            # Move the menu to the new position
+            menu.move(pos)
+
+            menu.show()
+
+        else:
+
+            event = QtGui.QContextMenuEvent(QtGui.QContextMenuEvent.Mouse, QtCore.QPoint())
+
+            self.text.contextMenuEvent(event)
+
+    def removeRow(self):
+
+        # Grab the cursor
+        cursor = self.text.textCursor()
+
+        # Grab the current table (we assume there is one, since
+        # this is checked before calling)
+        table = cursor.currentTable()
+
+        # Get the current cell
+        cell = table.cellAt(cursor)
+
+        # Delete the cell's row
+        table.removeRows(cell.row(), 1)
+
+    def removeCol(self):
+
+        # Grab the cursor
+        cursor = self.text.textCursor()
+
+        # Grab the current table (we assume there is one, since
+        # this is checked before calling)
+        table = cursor.currentTable()
+
+        # Get the current cell
+        cell = table.cellAt(cursor)
+
+        # Delete the cell's column
+        table.removeColumns(cell.column(), 1)
+
+    def insertRow(self):
+
+        # Grab the cursor
+        cursor = self.text.textCursor()
+
+        # Grab the current table (we assume there is one, since
+        # this is checked before calling)
+        table = cursor.currentTable()
+
+        # Get the current cell
+        cell = table.cellAt(cursor)
+
+        # Insert a new row at the cell's position
+        table.insertRows(cell.row(), 1)
+
+    def insertCol(self):
+
+        # Grab the cursor
+        cursor = self.text.textCursor()
+
+        # Grab the current table (we assume there is one, since
+        # this is checked before calling)
+        table = cursor.currentTable()
+
+        # Get the current cell
+        cell = table.cellAt(cursor)
+
+        # Insert a new row at the cell's position
+        table.insertColumns(cell.column(), 1)
+
+    def changed(self):
+        self.changesSaved = False
+
+    def closeEvent(self, event):
+
+        if self.changesSaved:
+
+            event.accept()
+
+        else:
+
+            popup = QtGui.QMessageBox(self)
+
+            popup.setIcon(QtGui.QMessageBox.Warning)
+
+            popup.setText("The document has been modified")
+
+            popup.setInformativeText("Do you want to save your changes?")
+
+            popup.setStandardButtons(QtGui.QMessageBox.Save |
+                                     QtGui.QMessageBox.Cancel |
+                                     QtGui.QMessageBox.Discard)
+
+            popup.setDefaultButton(QtGui.QMessageBox.Save)
+
+            answer = popup.exec_()
+
+            if answer == QtGui.QMessageBox.Save:
+                self.save()
+
+            elif answer == QtGui.QMessageBox.Discard:
+                event.accept()
+
+            else:
+                event.ignore()
 
 def main():
     app = QtGui.QApplication(sys.argv)
