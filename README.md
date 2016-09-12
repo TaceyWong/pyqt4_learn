@@ -69,6 +69,16 @@ https://www.zhihu.com/question/19857245
 + [极限主题的图标区域](http://bbs.themex.net/showthread.php?t=16839403) 
 + [The Noun Project](http://thenounproject.com/ )
 + [deviantart的图标区](http://browse.deviantart.com/customization/icons/os/mac/) 
++ [icon8](https://icons8.com/)
++ [flaticon](http://www.flaticon.com/)
++ [androidicons](http://www.androidicons.com/)
++ [iconarchive](http://www.iconarchive.com/)
++ [Iconfont-阿里巴巴矢量图标库](http://iconfont.cn/)
++ [icomoon](https://icomoon.io/app/)
++ http://www.veryicon.com/
++ http://www.easyicon.net/
++ https://www.iconfinder.com/
++ https://design.google.com/icons/
 
 
 
