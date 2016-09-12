@@ -64,6 +64,14 @@ PyQt4学习
 ##Icons
 https://www.zhihu.com/question/19857245
 
++ [图标工厂](http://iconfactory.com/freeware) 
++ [独眼图标搜索](http://www.iconfinder.com/) 
++ [极限主题的图标区域](http://bbs.themex.net/showthread.php?t=16839403) 
++ [The Noun Project](http://thenounproject.com/ )
++ [deviantart的图标区](http://browse.deviantart.com/customization/icons/os/mac/) 
+
+
+
 
 
 ##Tiny Projects Plan
